@@ -30,11 +30,13 @@ int runGpuSaxpy(int vectorSize) {
 	float *h_y_cpu = new float[vectorSize];
 	float scale = 2.0f;
 	float *d_x, *d_y;
+	int threadPerBlock = 256;
+	int blocksPerGrid = (vectorSize + threadPerBlock - 1) / threadPerBlock;
 
 	for (int i = 0; i < vectorSize; i++) {
-        h_x[i] = static_cast<float>(std::rand()) / RAND_MAX * 10.0f;  // Random float between 0 and 10
-        h_y[i] = static_cast<float>(std::rand()) / RAND_MAX * 10.0f;  // Random float between 0 and 10
-    }
+        	h_x[i] = static_cast<float>(std::rand()) / RAND_MAX * 10.0f;
+        	h_y[i] = static_cast<float>(std::rand()) / RAND_MAX * 10.0f;
+    	}
 	scale = static_cast<float>(std::rand()) / RAND_MAX * 10.0f;
 	std::cout << "Scale is " << scale << "\n\n";
 	std::cout << "First 5 of vector X: ";
@@ -44,19 +46,14 @@ int runGpuSaxpy(int vectorSize) {
 	std::cout << "\n\n";
 	std::cout << "First 5 of vector Y: ";
 	for(int i = 0; i < 5 && i < vectorSize; i++){
-		std::cout << h_y[i] << " ";
-		
+		std::cout << h_y[i] << " ";	
 	}
-
 	
 	cudaMalloc((void**)&d_x, vectorSize * sizeof(float));
 	cudaMalloc((void**)&d_y, vectorSize * sizeof(float));
 
 	cudaMemcpy(d_x, h_x, vectorSize * sizeof(float), cudaMemcpyHostToDevice);
 	cudaMemcpy(d_y, h_y, vectorSize * sizeof(float), cudaMemcpyHostToDevice);
-
-	int threadPerBlock = 256;
-	int blocksPerGrid = (vectorSize + threadPerBlock - 1) / threadPerBlock;
 
 	saxpy_gpu<<<blocksPerGrid, threadPerBlock>>>(d_x, d_y, scale, vectorSize);
 
@@ -101,15 +98,16 @@ int runGpuSaxpy(int vectorSize) {
 __global__
 void generatePoints (uint64_t * pSums, uint64_t pSumSize, uint64_t sampleSize) {
 	//	Insert code here
-	int idx = blockIdx.x * blockDim.x + threadIdx.x;	
+	int idx = blockIdx.x * blockDim.x + threadIdx.x;
+	float circle_radiu = 1.0f;	
 	if (idx < pSumSize){
-	uint64_t hitCount = 0;
-	curandState rngState;
-	curand_init(clock64(), idx, 0, &rngState);
+		uint64_t hitCount = 0;
+		curandState rngState;
+		curand_init(clock64(), idx, 0, &rngState);
 	for (int i = 0; i < sampleSize; i++){
 		float x = curand_uniform(&rngState);
 		float y = curand_uniform(&rngState);
-		if (x * x + y * y <= 1.0f){
+		if (x * x + y * y <= circle_radiu){
 			hitCount++;
 		}
 	}
