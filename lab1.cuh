@@ -16,11 +16,16 @@
 
 	// #define DEBUG_PRINT_DISABLE
 	
-	#define VECTOR_SIZE (1 << 15)
-
-	#define MC_SAMPLE_SIZE		1e6
-	#define MC_ITER_COUNT		32
-
+	//#define VECTOR_SIZE (1 << 15)
+	#define VECTOR_SIZE 1024
+	//#define VECTOR_SIZE 1048576
+	//#define VECTOR_SIZE 32768
+	//#define MC_SAMPLE_SIZE		1e6
+	//#define MC_SAMPLE_SIZE 1024
+	//#define MC_SAMPLE_SIZE 32768
+	#define MC_SAMPLE_SIZE 1048576	
+#define MC_ITER_COUNT		32
+	
 	#define WARP_SIZE			32
 	#define SAMPLE_SIZE			MC_SAMPLE_SIZE
 	#define GENERATE_BLOCKS		1024
